@@ -1,0 +1,41 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #f4f4f4;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    min-height: 100vh;
+}
+
+.container {
+    width: 500px;
+    background-color: white;
+    border: 1px solid #ddd;
+    padding: 40px;
+}
+
+.container h1 {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.container input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+
+    border: 1px solid #ccc;
+    outline: none;
+}
+
+.container input:focus {
+    border-color: #555;
+}
