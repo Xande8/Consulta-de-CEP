@@ -1,58 +1,36 @@
 import { useState } from "react";
 import "./App.css";
 
-export default function App() {
-  const [address, setAddress] = useState({
+function App() {
+  const [formData, setFormData] = useState({
     cep: "",
-    logradouro: "",
+    rua: "",
     numero: "",
     bairro: "",
-    uf: "",
-    localidade: "",
+    estado: "",
+    cidade: "",
   });
 
-  const handleChange = async (e) => {
-    const { name, value } = e.target;
+  const handleChange = (event) => {
+    const { name, value } = event.target;
 
-    if (name !== "cep") {
-      setAddress((prev) => ({
-        ...prev,
-        [name]: value,
-      }));
-      return;
-    }
-
-    let cepFormatado = value.replace(/\D/g, "");
-
-    if (cepFormatado.length > 8) {
-      cepFormatado = cepFormatado.slice(0, 8);
-    }
-
-    const cepExibicao =
-      cepFormatado.length > 5
-        ? `${cepFormatado.slice(0, 5)}-${cepFormatado.slice(5)}`
-        : cepFormatado;
-
-    setAddress((prev) => ({
-      ...prev,
-      cep: cepExibicao,
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
     }));
+  };
 
-    if (cepFormatado.length < 8) {
-      setAddress((prev) => ({
-        ...prev,
-        cep: cepExibicao,
-        logradouro: "",
-        bairro: "",
-        uf: "",
-        localidade: "",
-      }));
+  const buscarCEP = async () => {
+    const cepLimpo = formData.cep.replace(/\D/g, "");
+
+    if (cepLimpo.length !== 8) {
+      alert("Digite um CEP válido.");
       return;
     }
 
     try {
       const response = await fetch(
-        `https://viacep.com.br/ws/${cepFormatado}/json/`
+        `https://viacep.com.br/ws/${cepLimpo}/json/`
       );
 
       const data = await response.json();
@@ -60,49 +38,49 @@ export default function App() {
       if (data.erro) {
         alert("CEP não encontrado!");
 
-        setAddress((prev) => ({
-          ...prev,
-          logradouro: "",
+        setFormData((prevData) => ({
+          ...prevData,
+          rua: "",
           bairro: "",
-          uf: "",
-          localidade: "",
+          estado: "",
+          cidade: "",
         }));
 
         return;
       }
 
-      setAddress((prev) => ({
-        ...prev,
-        cep: cepExibicao,
-        logradouro: data.logradouro,
+      setFormData((prevData) => ({
+        ...prevData,
+        rua: data.logradouro,
         bairro: data.bairro,
-        uf: data.uf,
-        localidade: data.localidade,
+        estado: data.uf,
+        cidade: data.localidade,
       }));
     } catch (error) {
+      console.error(error);
       alert("Erro ao consultar o CEP.");
     }
   };
 
   return (
     <div className="container">
-      <h1>Address</h1>
+      <div className="card">
+        <h1>Cadastro de Endereço</h1>
 
-      <form>
         <input
           type="text"
           name="cep"
           placeholder="CEP"
-          value={address.cep}
+          value={formData.cep}
           onChange={handleChange}
-          maxLength={9}
+          onBlur={buscarCEP}
         />
 
         <input
           type="text"
-          name="logradouro"
+          name="rua"
           placeholder="Rua"
-          value={address.logradouro}
+          value={formData.rua}
           readOnly
         />
 
@@ -110,7 +88,7 @@ export default function App() {
           type="text"
           name="numero"
           placeholder="Número"
-          value={address.numero}
+          value={formData.numero}
           onChange={handleChange}
         />
 
@@ -118,26 +96,28 @@ export default function App() {
           type="text"
           name="bairro"
           placeholder="Bairro"
-          value={address.bairro}
+          value={formData.bairro}
           readOnly
         />
 
         <input
           type="text"
-          name="uf"
-          placeholder="UF"
-          value={address.uf}
+          name="estado"
+          placeholder="Estado"
+          value={formData.estado}
           readOnly
         />
 
         <input
           type="text"
-          name="localidade"
+          name="cidade"
           placeholder="Cidade"
-          value={address.localidade}
+          value={formData.cidade}
           readOnly
         />
-      </form>
+      </div>
     </div>
   );
 }
+
+export default App;
