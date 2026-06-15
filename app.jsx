@@ -1,4 +1,5 @@
 import { useState } from "react";
+import "./App.css";
 
 export default function App() {
   const [address, setAddress] = useState({
@@ -10,38 +11,76 @@ export default function App() {
     localidade: "",
   });
 
-  const handleChange = (e) => {
+  const handleChange = async (e) => {
     const { name, value } = e.target;
 
-    setAddress({
-      ...address,
-      [name]: value,
-    });
+    if (name !== "cep") {
+      setAddress((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+      return;
+    }
 
-    if (name === "cep") {
-      const cep = value.replace(/\D/g, "");
+    let cepFormatado = value.replace(/\D/g, "");
 
-      if (cep.length === 8) {
-        fetch(`https://viacep.com.br/ws/${cep}/json/`)
-          .then((response) => response.json())
-          .then((data) => {
-            if (!data.erro) {
-              setAddress((prev) => ({
-                ...prev,
-                cep: value,
-                logradouro: data.logradouro,
-                bairro: data.bairro,
-                uf: data.uf,
-                localidade: data.localidade,
-              }));
-            } else {
-              alert("CEP não encontrado!");
-            }
-          })
-          .catch(() => {
-            alert("Erro ao consultar CEP.");
-          });
+    if (cepFormatado.length > 8) {
+      cepFormatado = cepFormatado.slice(0, 8);
+    }
+
+    const cepExibicao =
+      cepFormatado.length > 5
+        ? `${cepFormatado.slice(0, 5)}-${cepFormatado.slice(5)}`
+        : cepFormatado;
+
+    setAddress((prev) => ({
+      ...prev,
+      cep: cepExibicao,
+    }));
+
+    if (cepFormatado.length < 8) {
+      setAddress((prev) => ({
+        ...prev,
+        cep: cepExibicao,
+        logradouro: "",
+        bairro: "",
+        uf: "",
+        localidade: "",
+      }));
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `https://viacep.com.br/ws/${cepFormatado}/json/`
+      );
+
+      const data = await response.json();
+
+      if (data.erro) {
+        alert("CEP não encontrado!");
+
+        setAddress((prev) => ({
+          ...prev,
+          logradouro: "",
+          bairro: "",
+          uf: "",
+          localidade: "",
+        }));
+
+        return;
       }
+
+      setAddress((prev) => ({
+        ...prev,
+        cep: cepExibicao,
+        logradouro: data.logradouro,
+        bairro: data.bairro,
+        uf: data.uf,
+        localidade: data.localidade,
+      }));
+    } catch (error) {
+      alert("Erro ao consultar o CEP.");
     }
   };
 
@@ -56,6 +95,7 @@ export default function App() {
           placeholder="CEP"
           value={address.cep}
           onChange={handleChange}
+          maxLength={9}
         />
 
         <input
@@ -63,7 +103,7 @@ export default function App() {
           name="logradouro"
           placeholder="Rua"
           value={address.logradouro}
-          onChange={handleChange}
+          readOnly
         />
 
         <input
@@ -79,7 +119,7 @@ export default function App() {
           name="bairro"
           placeholder="Bairro"
           value={address.bairro}
-          onChange={handleChange}
+          readOnly
         />
 
         <input
@@ -87,7 +127,7 @@ export default function App() {
           name="uf"
           placeholder="UF"
           value={address.uf}
-          onChange={handleChange}
+          readOnly
         />
 
         <input
@@ -95,7 +135,7 @@ export default function App() {
           name="localidade"
           placeholder="Cidade"
           value={address.localidade}
-          onChange={handleChange}
+          readOnly
         />
       </form>
     </div>
