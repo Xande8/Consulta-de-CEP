@@ -5,37 +5,51 @@
 }
 
 body {
-  font-family: Arial, sans-serif;
   background-color: #f4f4f4;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 .container {
-  width: 500px;
-  margin: 50px auto;
-  background-color: #ffffff;
-  padding: 30px;
-  border-radius: 5px;
-  border: 1px solid #ddd;
+  width: 100%;
+  min-height: 100vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-h1 {
+.card {
+  width: 500px;
+  padding: 40px;
+
+  background-color: #ffffff;
+  border: 1px solid #dcdcdc;
+  border-radius: 8px;
+
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.card h1 {
   text-align: center;
   margin-bottom: 25px;
-  font-size: 2rem;
 }
 
-form {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+.card input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 15px;
+
+  border: 1px solid #cccccc;
+  border-radius: 4px;
+
+  font-size: 16px;
 }
 
-input {
-  padding: 10px;
-  border: 1px solid #ccc;
-  font-size: 14px;
+.card input:focus {
+  outline: none;
+  border-color: #666;
 }
 
-input[readonly] {
-  background-color: #f8f8f8;
+.card input[readonly] {
+  background-color: #f9f9f9;
 }
